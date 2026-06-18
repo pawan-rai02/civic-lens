@@ -23,7 +23,21 @@
 # DBTITLE 1,Import libraries
 from pyspark.sql import functions as F
 from pyspark.sql.types import *
+import sys
 import re
+
+# Add src directory to path for imports
+sys.path.append('/Workspace/Users/pawanvirat32@gmail.com/civic-lens/src')
+
+# Import utility functions
+from nlp_utils import clean_text
+from geo_utils import normalize_borough
+
+# Create Spark UDFs from utility functions
+clean_text_udf = F.udf(clean_text, StringType())
+normalize_borough_udf = F.udf(normalize_borough, StringType())
+
+print("✓ Imported utility functions from src/")
 
 # COMMAND ----------
 
@@ -81,25 +95,25 @@ df_silver = (
     .withColumn("hour_filed", F.hour("created_date").cast("int"))
     .withColumn("month_filed", F.month("created_date").cast("int"))
     
-    # clean_text: string - cleaned descriptor + resolution_description
+    # clean_text: string - cleaned descriptor + resolution_description using nlp_utils.clean_text
     .withColumn(
         "clean_text",
-        F.concat_ws(
-            " ",
-            F.coalesce(F.trim(F.col("descriptor")), F.lit("")),
-            F.coalesce(F.trim(F.col("resolution_description")), F.lit(""))
+        clean_text_udf(
+            F.concat_ws(
+                " ",
+                F.coalesce(F.trim(F.col("descriptor")), F.lit("")),
+                F.coalesce(F.trim(F.col("resolution_description")), F.lit(""))
+            )
         )
     )
     
     # borough: string - direct, standardized casing
     .withColumn("borough", F.upper(F.trim(F.col("borough"))))
     
-    # borough_normalized: string - normalized for geojson joins (lowercase, no UNSPECIFIED)
+    # borough_normalized: string - normalized for geojson joins using geo_utils.normalize_borough
     .withColumn(
         "borough_normalized",
-        F.when(F.col("borough") != "UNSPECIFIED", 
-               F.lower(F.trim(F.col("borough"))))
-        .otherwise(None)
+        normalize_borough_udf(F.col("borough"))
     )
     
     # Clean location fields - use try_cast to handle malformed values
@@ -116,6 +130,30 @@ df_silver = (
 )
 
 print(f"Silver records (before filtering): {df_silver.count():,}")
+
+# COMMAND ----------
+
+# DBTITLE 1,Verify utility function integration
+# Verify that utility functions are working correctly
+print("=== Verification of Utility Function Integration ===\n")
+
+# Check clean_text output
+print("1. clean_text verification (should be lowercase, no punctuation):")
+sample_clean = df_silver.select("descriptor", "resolution_description", "clean_text").limit(3)
+display(sample_clean)
+
+print("\n2. borough_normalized verification (should be lowercase, no UNSPECIFIED):")
+sample_borough = df_silver.select("borough", "borough_normalized").distinct().orderBy("borough")
+display(sample_borough)
+
+# Count nulls in borough_normalized (should be all UNSPECIFIED records)
+unspecified_count = df_silver.filter(F.col("borough") == "UNSPECIFIED").count()
+null_normalized_count = df_silver.filter(F.col("borough_normalized").isNull()).count()
+
+print(f"\n3. Null handling:")
+print(f"   UNSPECIFIED boroughs: {unspecified_count:,}")
+print(f"   NULL borough_normalized: {null_normalized_count:,}")
+print(f"   ✓ Match: {unspecified_count == null_normalized_count}")
 
 # COMMAND ----------
 

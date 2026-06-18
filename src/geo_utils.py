@@ -5,7 +5,6 @@ Purpose: Inspect and join GeoJSON ward/borough boundaries against complaint data
 Handles the reality that GeoJSON property names vary (boro_name vs BoroName, etc.).
 """
 
-import geopandas as gpd
 import pandas as pd
 from typing import Dict, List, Tuple
 
@@ -27,6 +26,7 @@ def inspect_geojson(path: str) -> None:
     Example:
         inspect_geojson("s3://civiclens-data/geojson/nyc_boroughs.geojson")
     """
+    import geopandas as gpd  # Lazy import
     print(f"Loading: {path}")
     gdf = gpd.read_file(path)
     
@@ -48,6 +48,43 @@ def inspect_geojson(path: str) -> None:
         print(f"\n  {col}:")
         print(f"    Unique values: {gdf[col].nunique()}")
         print(f"    Sample: {gdf[col].head(5).tolist()}")
+
+
+def normalize_borough(name: str) -> str:
+    """
+    Normalize NYC borough names for GeoJSON joins.
+    
+    Steps:
+    - Handle null/empty values
+    - Strip whitespace and lowercase
+    - Filter out UNSPECIFIED
+    - Handle common variations (THE BRONX -> bronx, etc.)
+    
+    Args:
+        name: Raw borough name from 311 data
+        
+    Returns:
+        Normalized borough name for GeoJSON matching, or None if invalid
+        
+    Example:
+        normalize_borough("MANHATTAN") -> "manhattan"
+        normalize_borough("THE BRONX") -> "bronx"
+        normalize_borough("UNSPECIFIED") -> None
+    """
+    if pd.isna(name) or name is None or str(name).strip() == "":
+        return None
+    
+    name = str(name).strip().upper()
+    
+    # Filter out invalid values
+    if name in ["UNSPECIFIED", "UNKNOWN", "N/A", ""]:
+        return None
+    
+    # Normalize common variations
+    name = name.replace("THE ", "")  # "THE BRONX" -> "BRONX"
+    name = name.strip().lower()
+    
+    return name
 
 
 def normalize_ward_name(name: str) -> str:
