@@ -51,7 +51,7 @@ display(df['never_resolved'].value_counts(normalize=True))
 feature_cols = [
     'dow_filed', 'hour_filed', 'month_filed',
     'latitude', 'longitude',
-    'complaint_type_enc', 'agency_enc',
+    'complaint_type_enc', 'agency_enc', 'borough_enc',  # Added borough_enc for borough-specific learning
     'borough_blackhole_rate', 'agency_resolution_rate_hist', 'agency_open_complaints_30d',
     'urgency_score', 'topic_id'
 ] + [f'tfidf_feat_{i}' for i in range(1, 51)]
@@ -59,8 +59,9 @@ feature_cols = [
 print(f"Using {len(feature_cols)} features")
 
 # Separate regression and classification datasets
-# For regression: only rows with non-null resolution_days (resolved complaints)
-df_reg = df[df['resolution_days'].notna()].copy()
+# For regression: only rows with never_resolved=0 (truly resolved complaints)
+# This excludes never_resolved=1 cases which have inflated "days since filing" instead of actual resolution times
+df_reg = df[(df['resolution_days'].notna()) & (df['never_resolved'] == 0)].copy()
 X_reg = df_reg[feature_cols]
 y_reg = df_reg['resolution_days']
 
@@ -295,3 +296,7 @@ print("="*80)
 print(f"\nRegistered Models:")
 print(f"  1. civic_lens.ml.nyc_resolution_regressor v{registered_reg_model.version} ({reg_champion_name})")
 print(f"  2. civic_lens.ml.nyc_blackhole_classifier v{registered_clf_model.version} ({clf_champion_name})")
+
+# COMMAND ----------
+
+

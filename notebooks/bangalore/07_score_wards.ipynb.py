@@ -3,6 +3,12 @@
 # [tool.databricks.environment]
 # environment_version = "5"
 # ///
+# DBTITLE 1,Install Required Packages
+# MAGIC %pip install xgboost --quiet
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
+
 # DBTITLE 1,Notebook Header
 # MAGIC %md
 # MAGIC # 07 - Ward Risk Scoring: Complaint Outcome Predictions
@@ -101,7 +107,7 @@
 import mlflow
 import mlflow.pyfunc
 from pyspark.sql import functions as F
-from pyspark.sql.types import DoubleType, ArrayType
+from pyspark.sql.types import DoubleType, ArrayType, IntegerType
 from datetime import datetime
 
 print("=== Ward Risk Scoring: Batch Inference & Aggregation ===")
@@ -151,8 +157,10 @@ except:
         experiment = mlflow.get_experiment_by_name(experiment_name)
         
         if experiment:
+            # Load the most recent XGBoost model with multi:softprob
             runs = mlflow.search_runs(
                 experiment_ids=[experiment.experiment_id],
+                filter_string="params.objective = 'multi:softprob'",
                 order_by=["start_time DESC"],
                 max_results=1
             )
@@ -222,40 +230,90 @@ inference_df = gold_df.select(
 for col in FEATURE_COLS:
     inference_df = inference_df.fillna({col: 0})
 
-print(f"  ✓ Prepared {inference_df.count():,} complaints for inference")
+print(f"  ✓ Prepared features for inference")
 
-# Create Spark UDF for model predictions
-print("\nCreating Spark UDF for distributed inference...")
-predict_udf = mlflow.pyfunc.spark_udf(
-    spark, 
-    model_uri=model_uri,
-    result_type=DoubleType()
-)
+# Load and serialize model for UDF
+print("\nLoading and serializing XGBoost model...")
+import mlflow.xgboost
+import pickle
+import base64
 
-print("  ✓ UDF created and registered")
+xgb_model = mlflow.xgboost.load_model(model_uri)
+model_bytes = base64.b64encode(pickle.dumps(xgb_model)).decode('utf-8')
 
-# Apply model to predict outcomes
-# Create a struct with named fields to preserve feature names
+print(f"  ✓ Model serialized ({len(model_bytes)} bytes)")
+
+# Create pandas UDF with serialized model
+print("\nCreating pandas UDF for batch inference...")
+import pandas as pd
+from pyspark.sql.functions import pandas_udf
+
+# Store serialized model and feature cols
+_model_bytes = model_bytes
+_feature_cols = FEATURE_COLS
+
+@pandas_udf("array<double>")
+def predict_proba_udf(*cols: pd.Series) -> pd.Series:
+    import pickle
+    import base64
+    
+    # Deserialize model once per executor (cached)
+    model = pickle.loads(base64.b64decode(_model_bytes))
+    
+    # Stack columns into DataFrame
+    X = pd.concat(cols, axis=1)
+    X.columns = _feature_cols
+    
+    # Get probabilities
+    proba = model.predict_proba(X)
+    
+    # Return as list
+    return pd.Series([list(row) for row in proba])
+
+print("  ✓ UDF created with serialized model")
+
+# Apply model to predict outcome probabilities
 print("\nRunning batch inference...")
 scored_df = inference_df.withColumn(
+    "predicted_probabilities",
+    predict_proba_udf(*[F.col(c) for c in FEATURE_COLS])
+).withColumn(
+    "rejection_probability",
+    F.col("predicted_probabilities")[2]  # Extract P(Rejected) from [p0, p1, p2]
+).withColumn(
     "predicted_outcome",
-    predict_udf(F.struct(*[F.col(c).alias(c) for c in FEATURE_COLS]))
+    # Still compute hard class for validation (argmax of probabilities)
+    F.when(F.col("predicted_probabilities")[2] >= F.greatest(
+        F.col("predicted_probabilities")[0],
+        F.col("predicted_probabilities")[1],
+        F.col("predicted_probabilities")[2]
+    ), 2)
+    .when(F.col("predicted_probabilities")[1] >= F.col("predicted_probabilities")[0], 1)
+    .otherwise(0)
+    .cast(IntegerType())
 )
 
 print("  ✓ Predictions complete")
 
 # Verify predictions
-print("\nPrediction distribution:")
+print("\nPrediction distribution (hard class):")
 scored_df.groupBy("predicted_outcome") \
     .count() \
     .orderBy("predicted_outcome") \
     .show()
 
+print("\nRejection probability statistics:")
+scored_df.select(
+    F.round(F.avg("rejection_probability") * 100, 2).alias("avg_rejection_prob_pct"),
+    F.round(F.min("rejection_probability") * 100, 4).alias("min_rejection_prob_pct"),
+    F.round(F.max("rejection_probability") * 100, 2).alias("max_rejection_prob_pct")
+).show()
+
 print("Prediction labels:")
 print("  0 = Resolved")
 print("  1 = Closed")
 print("  2 = Rejected")
-print(f"\n✓ Scored {scored_df.count():,} complaints for aggregation")
+print(f"\n✓ Scored {scored_df.count():,} complaints with rejection probabilities")
 
 # COMMAND ----------
 
@@ -269,10 +327,13 @@ ward_risk = scored_df.groupBy("ward_name_normalized", "category").agg(
     # Total complaints
     F.count("*").alias("total_complaints"),
     
-    # Predicted outcome counts
+    # Predicted outcome counts (hard class, for reference)
     F.sum(F.when(F.col("predicted_outcome") == 0, 1).otherwise(0)).alias("predicted_resolved"),
     F.sum(F.when(F.col("predicted_outcome") == 1, 1).otherwise(0)).alias("predicted_closed"),
     F.sum(F.when(F.col("predicted_outcome") == 2, 1).otherwise(0)).alias("predicted_rejections"),
+    
+    # Average rejection probability (soft probability - KEY FIX for zero-wall)
+    F.avg("rejection_probability").alias("avg_rejection_probability"),
     
     # Boilerplate count
     F.sum(F.when(F.col("remark_is_boilerplate") == True, 1).otherwise(0)).alias("boilerplate_count")
@@ -282,13 +343,20 @@ print("  ✓ Aggregation complete")
 
 # Calculate risk scores
 print("\nCalculating risk scores...")
+print("  Using AVERAGE REJECTION PROBABILITY (soft) instead of hard class counts")
+print("  This fixes the zero-wall problem caused by class imbalance")
 
 ward_risk = ward_risk.withColumn(
     "rejection_risk_score",
-    (F.col("predicted_rejections") / F.col("total_complaints")).cast(DoubleType())
+    # Use average probability, not hard class count - KEY FIX
+    F.col("avg_rejection_probability").cast(DoubleType())
 ).withColumn(
     "boilerplate_risk_score",
     (F.col("boilerplate_count") / F.col("total_complaints")).cast(DoubleType())
+).withColumn(
+    "hard_class_rejection_rate",
+    # Keep old metric for comparison
+    (F.col("predicted_rejections") / F.col("total_complaints")).cast(DoubleType())
 )
 
 print("  ✓ Risk scores calculated")
@@ -298,6 +366,39 @@ print("\nSample ward-category risk scores:")
 ward_risk.orderBy(F.desc("rejection_risk_score")).show(10, truncate=False)
 
 print(f"\n✓ Generated risk scores for {ward_risk.count():,} ward-category combinations")
+
+# COMMAND ----------
+
+# DBTITLE 1,Diagnostic: Check Sparse-Cell Problem
+print("=== Diagnostic: Sparse-Cell Analysis ===")
+print("Checking if zero predictions are due to insufficient data per cell...\n")
+
+# Group size distribution
+group_sizes = ward_risk.select("total_complaints")
+
+print("Ward × Category cell size distribution:")
+group_sizes.select(
+    F.min("total_complaints").alias("min"),
+    F.expr("percentile(total_complaints, 0.25)").alias("p25"),
+    F.expr("percentile(total_complaints, 0.50)").alias("median"),
+    F.expr("percentile(total_complaints, 0.75)").alias("p75"),
+    F.max("total_complaints").alias("max"),
+    F.avg("total_complaints").alias("mean")
+).show()
+
+print("\nCells with < 10 complaints (sparse data):")
+sparse_count = ward_risk.filter(F.col("total_complaints") < 10).count()
+total_count = ward_risk.count()
+print(f"  {sparse_count:,} / {total_count:,} ({sparse_count/total_count*100:.1f}%)")
+
+print("\nCells with < 5 complaints (very sparse):")
+very_sparse_count = ward_risk.filter(F.col("total_complaints") < 5).count()
+print(f"  {very_sparse_count:,} / {total_count:,} ({very_sparse_count/total_count*100:.1f}%)")
+
+print("\n⚠️  Sparse cells may show misleadingly low risk scores due to small sample size,")
+print("   not model quality. Consider filtering or flagging cells with <15 complaints.")
+
+print("\n✓ Sparse-cell diagnostic complete")
 
 # COMMAND ----------
 

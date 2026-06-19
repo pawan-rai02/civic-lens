@@ -39,7 +39,8 @@ assert final_count == initial_count, f"Row count mismatch! Expected {initial_cou
 # Label encode categorical features
 indexers = [
     StringIndexer(inputCol="complaint_type", outputCol="complaint_type_enc", handleInvalid="keep"),
-    StringIndexer(inputCol="agency", outputCol="agency_enc", handleInvalid="keep")
+    StringIndexer(inputCol="agency", outputCol="agency_enc", handleInvalid="keep"),
+    StringIndexer(inputCol="borough", outputCol="borough_enc", handleInvalid="keep")
 ]
 
 pipeline = Pipeline(stages=indexers)
@@ -69,6 +70,7 @@ feature_cols = [
     # Categorical features (encoded)
     "complaint_type_enc",
     "agency_enc",
+    "borough_enc",
     
     # Borough/Agency aggregates
     "borough_blackhole_rate",

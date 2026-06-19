@@ -111,6 +111,7 @@ from sklearn.metrics import (
     accuracy_score, precision_recall_fscore_support,
     confusion_matrix, classification_report, roc_auc_score
 )
+from sklearn.utils.class_weight import compute_sample_weight
 import xgboost as xgb
 
 print("=== ML Model Training: BBMP Outcome Prediction ===")
@@ -283,7 +284,7 @@ with mlflow.start_run(run_name="xgboost_multiclass") as run:
     
     # Define XGBoost parameters
     xgb_params = {
-        "objective": "multi:softmax",
+        "objective": "multi:softprob",
         "num_class": 3,
         "max_depth": 6,
         "learning_rate": 0.1,
@@ -306,10 +307,16 @@ with mlflow.start_run(run_name="xgboost_multiclass") as run:
     mlflow.log_param("test_samples", len(X_test))
     mlflow.log_param("test_size", TEST_SIZE)
     
+    # Compute class weights to handle imbalance (4.4% rejections)
+    print("\nComputing sample weights for class imbalance...")
+    sample_weights = compute_sample_weight(class_weight="balanced", y=y_train)
+    print(f"  Sample weight range: {sample_weights.min():.2f} - {sample_weights.max():.2f}")
+    print(f"  Rejection class upweighted by ~{sample_weights[y_train == 2].mean() / sample_weights[y_train == 1].mean():.1f}x")
+    
     # Train model
-    print("\nTraining XGBoost...")
+    print("\nTraining XGBoost with sample weights...")
     xgb_model = xgb.XGBClassifier(**xgb_params)
-    xgb_model.fit(X_train, y_train)
+    xgb_model.fit(X_train, y_train, sample_weight=sample_weights)
     print("✓ Training complete")
     
     # Make predictions
