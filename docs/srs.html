@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicPulse — SRS Document</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111620;
+    --surface2: #181f2e;
+    --border: #1e2a3a;
+    --accent: #00d4aa;
+    --accent2: #ff6b35;
+    --accent3: #4f8ef7;
+    --accent4: #c084fc;
+    --text: #e2e8f0;
+    --text-dim: #7a8fa6;
+    --text-bright: #f0f6ff;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    padding: 80px 60px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,142,247,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .doc-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,170,0.08);
+    border: 1px solid rgba(0,212,170,0.2);
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    max-width: 700px;
+  }
+  .meta-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+  }
+  .meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .meta-value {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 260px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 0;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .sidebar-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 24px;
+    margin-bottom: 16px;
+  }
+  .nav-section { margin-bottom: 8px; }
+  .nav-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 8px 24px 4px;
+    display: block;
+  }
+  .nav-link {
+    display: block;
+    padding: 7px 24px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+  .nav-link:hover {
+    color: var(--text-bright);
+    border-left-color: var(--accent);
+    background: rgba(0,212,170,0.04);
+  }
+
+  /* ─── CONTENT ─── */
+  .content { padding: 48px 60px; max-width: 960px; }
+
+  /* ─── SECTIONS ─── */
+  section { margin-bottom: 72px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,170,0.08);
+    border: 1px solid rgba(0,212,170,0.15);
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin: 28px 0 12px;
+    letter-spacing: -0.2px;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent3);
+    margin: 20px 0 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  p { color: var(--text); margin-bottom: 12px; font-size: 13.5px; }
+
+  /* ─── CALLOUT BOXES ─── */
+  .callout {
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 3px solid;
+    font-size: 13px;
+  }
+  .callout-info { background: rgba(79,142,247,0.07); border-color: var(--accent3); }
+  .callout-warn { background: rgba(245,158,11,0.07); border-color: var(--warning); }
+  .callout-success { background: rgba(34,197,94,0.07); border-color: var(--success); }
+  .callout-danger { background: rgba(239,68,68,0.07); border-color: var(--danger); }
+  .callout strong { display: block; margin-bottom: 6px; font-size: 11px; font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+  .callout-info strong { color: var(--accent3); }
+  .callout-warn strong { color: var(--warning); }
+  .callout-success strong { color: var(--success); }
+  .callout-danger strong { color: var(--danger); }
+
+  /* ─── TABLES ─── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 4px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead { background: var(--surface2); }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,42,58,0.6);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  .td-key { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 500; }
+  .td-type { font-family: var(--mono); font-size: 11px; color: var(--accent4); }
+  .td-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .badge-required { background: rgba(239,68,68,0.15); color: #f87171; }
+  .badge-optional { background: rgba(100,116,139,0.15); color: #94a3b8; }
+  .badge-derived { background: rgba(0,212,170,0.12); color: var(--accent); }
+  .badge-target { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+  /* ─── CODE BLOCKS ─── */
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: #c9d1d9;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+  .kw { color: #ff79c6; }
+  .fn { color: #50fa7b; }
+  .str { color: #f1fa8c; }
+  .cm { color: #6272a4; }
+  .num { color: #bd93f9; }
+
+  /* ─── ARCH DIAGRAM ─── */
+  .arch-diagram {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    margin: 20px 0;
+  }
+  .arch-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 0;
+  }
+  .arch-layer {
+    flex: 1;
+    text-align: center;
+    padding: 20px 16px;
+    position: relative;
+  }
+  .arch-layer::after {
+    content: '→';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--text-dim);
+    z-index: 1;
+  }
+  .arch-layer:last-child::after { display: none; }
+  .arch-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    display: inline-block;
+    font-weight: 500;
+  }
+  .badge-bronze { background: rgba(180,83,9,0.2); color: #fb923c; border: 1px solid rgba(180,83,9,0.3); }
+  .badge-silver { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+  .badge-gold { background: rgba(161,98,7,0.2); color: #fbbf24; border: 1px solid rgba(161,98,7,0.3); }
+  .badge-serve { background: rgba(0,212,170,0.1); color: var(--accent); border: 1px solid rgba(0,212,170,0.2); }
+  .arch-layer-title { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
+  .arch-items { font-size: 11px; color: var(--text-dim); line-height: 1.8; }
+
+  /* ─── PIPELINE STEPS ─── */
+  .pipeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 20px 0;
+  }
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    left: 11px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent3), var(--accent4));
+  }
+  .pipeline-step {
+    position: relative;
+    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 20px;
+  }
+  .pipeline-step::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 18px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .step-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .step-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+  .step-desc { font-size: 12.5px; color: var(--text-dim); }
+
+  /* ─── ML MODEL CARDS ─── */
+  .model-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+  .model-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .model-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .model-card.primary::before { background: var(--accent); }
+  .model-card.secondary::before { background: var(--accent2); }
+  .model-card.tertiary::before { background: var(--accent3); }
+  .model-card.quaternary::before { background: var(--accent4); }
+  .model-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .model-name { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
+  .model-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.6; }
+  .model-meta { font-family: var(--mono); font-size: 11px; color: var(--accent3); }
+
+  /* ─── FEATURE TABLE SPECIAL ─── */
+  .feature-importance-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fi-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--accent);
+    min-width: 4px;
+  }
+  .fi-val { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+
+  /* ─── DATASET CARDS ─── */
+  .ds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+  .ds-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+  }
+  .ds-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+  .ds-primary { background: rgba(0,212,170,0.1); color: var(--accent); border: 1px solid rgba(0,212,170,0.2); }
+  .ds-secondary { background: rgba(79,142,247,0.1); color: var(--accent3); border: 1px solid rgba(79,142,247,0.2); }
+  .ds-tertiary { background: rgba(192,132,252,0.1); color: var(--accent4); border: 1px solid rgba(192,132,252,0.2); }
+  .ds-name { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+  .ds-url {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent3);
+    text-decoration: none;
+    word-break: break-all;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .ds-url:hover { text-decoration: underline; }
+  .ds-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .ds-cols { margin-top: 10px; }
+  .ds-col-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin: 2px 2px 2px 0;
+  }
+
+  /* ─── TAG CHIPS ─── */
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin: 2px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── RISK MATRIX ─── */
+  .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 20px 0; }
+  .risk-cell { padding: 12px 14px; border-radius: 3px; font-size: 12px; }
+  .risk-low { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+  .risk-med { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #fcd34d; }
+  .risk-high { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+  .risk-cell strong { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* ─── NLP SECTION ─── */
+  .nlp-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+    position: relative;
+    padding-left: 24px;
+  }
+  .nlp-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nlp-step:last-child { border-bottom: none; }
+  .nlp-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent4);
+    width: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .nlp-content { flex: 1; }
+  .nlp-title { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; }
+  .nlp-desc { font-size: 12px; color: var(--text-dim); }
+
+  /* ─── TOC ─── */
+  .toc { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 24px 28px; margin-bottom: 48px; }
+  .toc-title { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
+  .toc-list { list-style: none; }
+  .toc-list li { padding: 4px 0; }
+  .toc-list a { color: var(--text-dim); text-decoration: none; font-size: 13px; font-family: var(--mono); }
+  .toc-list a:hover { color: var(--accent); }
+  .toc-list .num { color: var(--accent); margin-right: 8px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .footer-brand { color: var(--accent); }
+
+  /* ─── PRODUCTION CHECKLIST ─── */
+  .checklist { margin: 16px 0; }
+  .check-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(30,42,58,0.5);
+    font-size: 13px;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .content { padding: 32px 24px; }
+    .hero { padding: 40px 24px; }
+    .hero h1 { font-size: 36px; }
+    .arch-row { flex-direction: column; }
+    .arch-layer::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="doc-tag">Software Requirements Specification</div>
+  <h1><span>CivicPulse</span> — Municipal Complaint<br>Resolution Predictor</h1>
+  <p class="hero-sub">Version 1.0 &nbsp;·&nbsp; June 2025 &nbsp;·&nbsp; Pawan Kumar &nbsp;·&nbsp; JSS Academy of Technical Education, Noida</p>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="meta-label">Project Code</div><div class="meta-value">CIVICPULSE-v1</div></div>
+    <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value" style="color:var(--success)">Active Development</div></div>
+    <div class="meta-item"><div class="meta-label">Tech Stack</div><div class="meta-value">Databricks · PySpark</div></div>
+    <div class="meta-item"><div class="meta-label">Data Scale</div><div class="meta-value">35M+ Records</div></div>
+    <div class="meta-item"><div class="meta-label">ML Models</div><div class="meta-value">4 Algorithms</div></div>
+    <div class="meta-item"><div class="meta-label">Output</div><div class="meta-value">Ward Risk Heatmap</div></div>
+  </div>
+</header>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sidebar-title">Contents</div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Overview</span>
+    <a class="nav-link" href="#s1">1. Introduction & Scope</a>
+    <a class="nav-link" href="#s2">2. Problem Statement</a>
+    <a class="nav-link" href="#s3">3. Objectives</a>
+  </div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Data</span>
+    <a class="nav-link" href="#s4">4. Datasets & Sources</a>
+    <a class="nav-link" href="#s5">5. Schema Definitions</a>
+    <a class="nav-link" href="#s6">6. NLP Pipeline</a>
+  </div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Architecture</span>
+    <a class="nav-link" href="#s7">7. Medallion Architecture</a>
+    <a class="nav-link" href="#s8">8. Feature Engineering</a>
+    <a class="nav-link" href="#s9">9. ML Model Suite</a>
+  </div>
+
+  <div class="nav-section">
+    <span class="nav-section-label">Production</span>
+    <a class="nav-link" href="#s10">10. Production Steps</a>
+    <a class="nav-link" href="#s11">11. Output & Visualisation</a>
+    <a class="nav-link" href="#s12">12. Risk Register</a>
+    <a class="nav-link" href="#s13">13. Non-Functional Req.</a>
+    <a class="nav-link" href="#s14">14. Project Timeline</a>
+  </div>
+</nav>
+
+<!-- ── CONTENT ── -->
+<main class="content">
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="num">01</span>Introduction & Scope</a></li>
+      <li><a href="#s2"><span class="num">02</span>Problem Statement</a></li>
+      <li><a href="#s3"><span class="num">03</span>Objectives & Success Metrics</a></li>
+      <li><a href="#s4"><span class="num">04</span>Datasets, Sources & Download Links</a></li>
+      <li><a href="#s5"><span class="num">05</span>Schema Definitions — All Layers</a></li>
+      <li><a href="#s6"><span class="num">06</span>NLP Text Pipeline</a></li>
+      <li><a href="#s7"><span class="num">07</span>Medallion Architecture (Bronze → Gold)</a></li>
+      <li><a href="#s8"><span class="num">08</span>Feature Engineering Catalogue</a></li>
+      <li><a href="#s9"><span class="num">09</span>ML Model Suite (4 Algorithms)</a></li>
+      <li><a href="#s10"><span class="num">10</span>Production Build Steps</a></li>
+      <li><a href="#s11"><span class="num">11</span>Output Layer & Visualisation</a></li>
+      <li><a href="#s12"><span class="num">12</span>Risk Register</a></li>
+      <li><a href="#s13"><span class="num">13</span>Non-Functional Requirements</a></li>
+      <li><a href="#s14"><span class="num">14</span>Project Timeline</a></li>
+    </ul>
+  </div>
+
+  <!-- ─── S1 ─── -->
+  <section id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Introduction & Scope</h2>
+    </div>
+
+    <p><strong>CivicPulse</strong> is a production-grade end-to-end machine learning system that ingests public civic complaint records, engineers temporal and NLP features, trains a multi-algorithm ML suite, and surfaces predictions as an interactive ward-level risk heatmap. The system answers two questions simultaneously:</p>
+
+    <div class="model-grid" style="grid-template-columns: 1fr 1fr; margin: 24px 0;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:20px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Regression Task</div>
+        <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--text-bright);margin-bottom:6px;">How long will this complaint take to resolve?</div>
+        <div style="font-size:12px;color:var(--text-dim);">Predicts resolution days from filed date using regression + gradient boosting</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:20px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Classification Task</div>
+        <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--text-bright);margin-bottom:6px;">Will this complaint never be resolved?</div>
+        <div style="font-size:12px;color:var(--text-dim);">Binary classifier for complaints censored at 90 days — the "black hole" detector</div>
+      </div>
+    </div>
+
+    <h3>System Boundaries</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>In Scope</th><th>Out of Scope</th></tr></thead>
+        <tbody>
+          <tr><td>Data Ingestion</td><td>NYC 311 API, data.gov.in CSV, Kaggle Smart Cities</td><td>Real-time 311 webhooks</td></tr>
+          <tr><td>Processing</td><td>PySpark on Databricks, Delta Lake</td><td>Hadoop MapReduce, on-prem infra</td></tr>
+          <tr><td>ML</td><td>XGBoost, Random Forest, Linear Regression, NLP classifier</td><td>Deep learning (out of scope v1)</td></tr>
+          <tr><td>Output</td><td>Folium / Kepler.gl heatmap, MLflow dashboard</td><td>Mobile app, citizen-facing portal</td></tr>
+          <tr><td>Target Users</td><td>Ward administrators, city analytics teams, portfolio reviewers</td><td>Individual citizens filing complaints</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── S2 ─── -->
+  <section id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Problem Statement</h2>
+    </div>
+
+    <p>India's Smart Cities Mission and state civic portals receive millions of complaints annually across categories like garbage collection, road damage, water supply disruptions, and electricity faults. Despite digitisation, two structural problems persist:</p>
+
+    <div class="callout callout-danger">
+      <strong>Pain Point 1 — Zero Citizen Visibility</strong>
+      Citizens who file complaints on platforms like Swachh Bharat Mission portals, MyGov, or state 311-equivalents receive no estimated resolution timeline. They have no way to know if their complaint has been deprioritised, lost in a departmental queue, or is actively being worked on.
+    </div>
+
+    <div class="callout callout-warn">
+      <strong>Pain Point 2 — Ward Administrator Blind Spots</strong>
+      Ward-level administrators cannot identify systemic resolution failures — specific ward × complaint-type combinations that chronically go unresolved. Without this visibility, resource allocation remains reactive rather than predictive.
+    </div>
+
+    <p>CivicPulse addresses both: it predicts time-to-resolution for new complaints, and identifies "black hole" patterns — ward-level clusters where complaints are disproportionately likely to never close within 90 days.</p>
+  </section>
+
+  <!-- ─── S3 ─── -->
+  <section id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Objectives & Success Metrics</h2>
+    </div>
+
+    <h3>Primary Objectives</h3>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-label">OBJ-01</div>
+        <div class="step-title">Build a scalable Bronze → Gold Medallion pipeline on Databricks</div>
+        <div class="step-desc">Ingest, clean, and enrich 35M+ records from NYC 311 and Indian government open data using PySpark + Delta Live Tables with Auto Loader.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">OBJ-02</div>
+        <div class="step-title">Engineer 20+ temporal, categorical, and NLP features</div>
+        <div class="step-desc">Transform raw complaint text and metadata into a training-ready Gold table with department load, historical resolution rates, and BERT-based urgency embeddings.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">OBJ-03</div>
+        <div class="step-title">Train and compare 4 ML algorithms tracked in MLflow</div>
+        <div class="step-desc">Regression: XGBoost + Random Forest. Classification: XGBoost Classifier + Logistic Regression. All experiments logged, compared, and registered in Unity Catalog.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">OBJ-04</div>
+        <div class="step-title">Surface results as an interactive ward-level heatmap</div>
+        <div class="step-desc">Folium + Kepler.gl map showing black-hole risk scores per ward, filterable by complaint type and department.</div>
+      </div>
+    </div>
+
+    <h3>Success Metrics</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Model</th><th>Target</th><th>Minimum Acceptable</th></tr></thead>
+        <tbody>
+          <tr><td>RMSE (resolution days)</td><td>XGBoost Regressor</td><td>&lt; 5 days</td><td>&lt; 8 days</td></tr>
+          <tr><td>MAE (resolution days)</td><td>Random Forest Regressor</td><td>&lt; 3 days</td><td>&lt; 5 days</td></tr>
+          <tr><td>F1-Score (never-resolved)</td><td>XGBoost Classifier</td><td>&gt; 0.78</td><td>&gt; 0.70</td></tr>
+          <tr><td>AUC-ROC (black hole)</td><td>Logistic Regression</td><td>&gt; 0.85</td><td>&gt; 0.78</td></tr>
+          <tr><td>Pipeline run time</td><td>Full DLT pipeline</td><td>&lt; 20 min</td><td>&lt; 45 min</td></tr>
+          <tr><td>NLP classification accuracy</td><td>TF-IDF + LightGBM</td><td>&gt; 80%</td><td>&gt; 72%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── S4 ─── -->
+  <section id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Datasets, Sources & Download Links</h2>
+    </div>
+
+    <div class="ds-grid">
+
+      <div class="ds-card">
+        <span class="ds-badge ds-primary">Primary · 35M+ rows</span>
+        <div class="ds-name">NYC 311 Service Requests (2010–Present)</div>
+        <a class="ds-url" href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9" target="_blank">data.cityofnewyork.us → erm2-nwe9</a>
+        <div class="ds-desc">The backbone training dataset. 35M+ civic complaint records with filed date, closed date, complaint type, agency, location, borough, community district. Free Socrata API, no key required.</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">unique_key</span>
+          <span class="ds-col-tag">created_date</span>
+          <span class="ds-col-tag">closed_date</span>
+          <span class="ds-col-tag">complaint_type</span>
+          <span class="ds-col-tag">descriptor</span>
+          <span class="ds-col-tag">agency</span>
+          <span class="ds-col-tag">borough</span>
+          <span class="ds-col-tag">community_board</span>
+          <span class="ds-col-tag">latitude</span>
+          <span class="ds-col-tag">longitude</span>
+          <span class="ds-col-tag">status</span>
+          <span class="ds-col-tag">resolution_description</span>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <span class="ds-badge ds-secondary">India Validation · CSV</span>
+        <div class="ds-name">India Open Govt Data — Municipal Complaints</div>
+        <a class="ds-url" href="https://data.gov.in/search?query=municipal+complaint" target="_blank">data.gov.in → Search "municipal complaint"</a>
+        <div class="ds-desc">Multiple state-level complaint datasets. Filter by Ministry of Housing & Urban Affairs. Download CSV directly. Use for India-specific validation and to demonstrate transferability.</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">complaint_id</span>
+          <span class="ds-col-tag">ward</span>
+          <span class="ds-col-tag">category</span>
+          <span class="ds-col-tag">sub_category</span>
+          <span class="ds-col-tag">date_raised</span>
+          <span class="ds-col-tag">date_closed</span>
+          <span class="ds-col-tag">status</span>
+          <span class="ds-col-tag">department</span>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <span class="ds-badge ds-tertiary">Supplemental · Kaggle</span>
+        <div class="ds-name">Smart Cities India — Civic Data</div>
+        <a class="ds-url" href="https://www.kaggle.com/datasets/search?q=smart+cities+india+complaints" target="_blank">kaggle.com → "smart cities india complaints"</a>
+        <div class="ds-desc">Community-curated Smart City complaint records from Indian municipalities. Useful for geo-enrichment and testing India-specific patterns. Several datasets cover Pune, Surat, Indore.</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">complaint_type</span>
+          <span class="ds-col-tag">city</span>
+          <span class="ds-col-tag">ward_no</span>
+          <span class="ds-col-tag">resolution_days</span>
+          <span class="ds-col-tag">is_resolved</span>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <span class="ds-badge ds-secondary">Geo · Shapefiles</span>
+        <div class="ds-name">Municipal Ward Boundary Shapefiles</div>
+        <a class="ds-url" href="https://www.data.gov.in/catalog/municipal-ward-boundaries" target="_blank">data.gov.in → Ward Boundaries OR OpenCity.in</a>
+        <div class="ds-desc">Ward polygon shapefiles (.geojson or .shp) needed for the choropleth heatmap. NYC community district boundaries available at NYC Open Data planning portal.</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">ward_id</span>
+          <span class="ds-col-tag">ward_name</span>
+          <span class="ds-col-tag">city</span>
+          <span class="ds-col-tag">geometry</span>
+          <span class="ds-col-tag">area_sq_km</span>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <span class="ds-badge ds-primary">BMC Data · RTI / Portal</span>
+        <div class="ds-name">Mumbai BMC Complaint Records</div>
+        <a class="ds-url" href="https://data.opencity.in/dataset?organization=brihanmumbai-municipal-corporation" target="_blank">data.opencity.in → BMC Organization</a>
+        <div class="ds-desc">OpenCity India hosts curated BMC civic data. Complement with Mumbai grievance portal. Good for India-specific ward-level analysis to validate the NYC-trained model.</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">grievance_id</span>
+          <span class="ds-col-tag">ward</span>
+          <span class="ds-col-tag">complaint_category</span>
+          <span class="ds-col-tag">registered_on</span>
+          <span class="ds-col-tag">resolved_on</span>
+          <span class="ds-col-tag">department</span>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <span class="ds-badge ds-tertiary">NLP Text · Enrichment</span>
+        <div class="ds-name">Complaint Description Free Text</div>
+        <a class="ds-url" href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9" target="_blank">Same NYC 311 dataset — descriptor column</a>
+        <div class="ds-desc">The <code>descriptor</code> and <code>resolution_description</code> columns in NYC 311 contain free-text descriptions — the raw material for the NLP sub-pipeline (TF-IDF, urgency scoring, topic extraction).</div>
+        <div class="ds-cols">
+          <span class="ds-col-tag">descriptor</span>
+          <span class="ds-col-tag">resolution_description</span>
+          <span class="ds-col-tag">location_type</span>
+        </div>
+      </div>
+
+    </div>
+
+    <h3>Socrata API Quick-Start</h3>
+    <pre><span class="cm"># Pull 500K recent NYC 311 records via Socrata SODA API (no key required)</span>
+<span class="cm"># Endpoint: https://data.cityofnewyork.us/resource/erm2-nwe9.json</span>
+
+<span class="kw">import</span> requests, pandas <span class="kw">as</span> pd
+
+BASE_URL = <span class="str">"https://data.cityofnewyork.us/resource/erm2-nwe9.json"</span>
+
+<span class="kw">def</span> <span class="fn">fetch_nyc311</span>(limit=<span class="num">500_000</span>, offset=<span class="num">0</span>):
+    params = {
+        <span class="str">"$limit"</span>: limit,
+        <span class="str">"$offset"</span>: offset,
+        <span class="str">"$order"</span>: <span class="str">"created_date DESC"</span>,
+        <span class="str">"$where"</span>: <span class="str">"created_date > '2020-01-01'"</span>,
+        <span class="str">"$select"</span>: <span class="str">"unique_key,created_date,closed_date,complaint_type,descriptor,agency,borough,community_board,latitude,longitude,status,resolution_description"</span>
+    }
+    r = requests.get(BASE_URL, params=params, timeout=<span class="num">120</span>)
+    <span class="kw">return</span> pd.DataFrame(r.json())
+
+df = <span class="fn">fetch_nyc311</span>()
+df.to_csv(<span class="str">"nyc311_raw.csv"</span>, index=<span class="kw">False</span>)</pre>
+
+    <div class="callout callout-info">
+      <strong>Spark Ingestion Tip</strong>
+      For large-scale ingestion via PySpark on Databricks, use the Socrata API paginated loop and write directly to S3 Bronze as Delta. Set batch size to 100K rows, paginate with <code>$offset</code>, and run in a Databricks Job with retries on HTTP 429.
+    </div>
+  </section>
+
+  <!-- ─── S5 ─── -->
+  <section id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Schema Definitions — All Layers</h2>
+    </div>
+
+    <h3>Bronze Layer — Raw Ingestion Schema</h3>
+    <p>Exact field names from the NYC 311 Socrata API. All columns kept as-is; no transformations applied at Bronze.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Column</th><th>Type</th><th>Nullable</th><th>Description</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">unique_key</td><td class="td-type">STRING</td><td>No</td><td>System-generated complaint ID</td><td><span class="td-badge badge-required">PK</span></td></tr>
+          <tr><td class="td-key">created_date</td><td class="td-type">TIMESTAMP</td><td>No</td><td>Date/time complaint was filed</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">closed_date</td><td class="td-type">TIMESTAMP</td><td>Yes</td><td>Date/time complaint was closed (null = open)</td><td><span class="td-badge badge-target">Target</span></td></tr>
+          <tr><td class="td-key">agency</td><td class="td-type">STRING</td><td>No</td><td>Responsible city agency code (e.g. DSNY, DOT)</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">agency_name</td><td class="td-type">STRING</td><td>Yes</td><td>Full agency name</td><td><span class="td-badge badge-optional">Optional</span></td></tr>
+          <tr><td class="td-key">complaint_type</td><td class="td-type">STRING</td><td>No</td><td>High-level complaint category (e.g. "HEAT/HOT WATER")</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">descriptor</td><td class="td-type">STRING</td><td>Yes</td><td>Free-text description of complaint — NLP INPUT</td><td><span class="td-badge badge-required">NLP</span></td></tr>
+          <tr><td class="td-key">location_type</td><td class="td-type">STRING</td><td>Yes</td><td>Type of location (Street, Building, etc.)</td><td><span class="td-badge badge-optional">Optional</span></td></tr>
+          <tr><td class="td-key">incident_zip</td><td class="td-type">STRING</td><td>Yes</td><td>Zip code of complaint location</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">community_board</td><td class="td-type">STRING</td><td>Yes</td><td>NYC community board (proxy for ward)</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">borough</td><td class="td-type">STRING</td><td>Yes</td><td>NYC borough (Manhattan, Brooklyn, etc.)</td><td><span class="td-badge badge-required">Required</span></td></tr>
+          <tr><td class="td-key">latitude</td><td class="td-type">DOUBLE</td><td>Yes</td><td>Complaint location latitude</td><td><span class="td-badge badge-required">Geo</span></td></tr>
+          <tr><td class="td-key">longitude</td><td class="td-type">DOUBLE</td><td>Yes</td><td>Complaint location longitude</td><td><span class="td-badge badge-required">Geo</span></td></tr>
+          <tr><td class="td-key">status</td><td class="td-type">STRING</td><td>No</td><td>Open / Closed / Pending / In Progress</td><td><span class="td-badge badge-target">Target</span></td></tr>
+          <tr><td class="td-key">resolution_description</td><td class="td-type">STRING</td><td>Yes</td><td>Free-text resolution notes — NLP LABEL INPUT</td><td><span class="td-badge badge-optional">NLP</span></td></tr>
+          <tr><td class="td-key">_ingestion_ts</td><td class="td-type">TIMESTAMP</td><td>No</td><td>Auto Loader ingestion timestamp (added at Bronze)</td><td><span class="td-badge badge-derived">Derived</span></td></tr>
+          <tr><td class="td-key">_source</td><td class="td-type">STRING</td><td>No</td><td>"nyc311" | "india_gov" | "bmc" (source tag)</td><td><span class="td-badge badge-derived">Derived</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Silver Layer — Cleaned & Enriched Schema</h3>
+    <p>Transformations applied: null closed_date → censored flag, duration computed, text cleaned, complaint type normalised across sources.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Column</th><th>Type</th><th>Source</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">complaint_id</td><td class="td-type">STRING</td><td>Bronze</td><td>Renamed from unique_key; standardised across sources</td></tr>
+          <tr><td class="td-key">created_date</td><td class="td-type">TIMESTAMP</td><td>Bronze</td><td>Parsed and validated (reject if &gt; today)</td></tr>
+          <tr><td class="td-key">closed_date</td><td class="td-type">TIMESTAMP</td><td>Bronze</td><td>Null retained; censored_flag computed</td></tr>
+          <tr><td class="td-key">resolution_days</td><td class="td-type">DOUBLE</td><td><span class="td-badge badge-derived">Derived</span></td><td>(closed_date - created_date).days — regression TARGET</td></tr>
+          <tr><td class="td-key">is_censored</td><td class="td-type">BOOLEAN</td><td><span class="td-badge badge-derived">Derived</span></td><td>True if complaint open after 90 days — classification TARGET</td></tr>
+          <tr><td class="td-key">never_resolved</td><td class="td-type">INTEGER (0/1)</td><td><span class="td-badge badge-derived">Derived</span></td><td>1 if still open at 90-day cutoff — BLACK HOLE label</td></tr>
+          <tr><td class="td-key">complaint_category</td><td class="td-type">STRING</td><td>Bronze+Mapping</td><td>Normalised category: GARBAGE | ROAD | WATER | ELECTRICITY | NOISE | OTHER</td></tr>
+          <tr><td class="td-key">department_code</td><td class="td-type">STRING</td><td>Bronze</td><td>Standardised agency/department code</td></tr>
+          <tr><td class="td-key">ward_id</td><td class="td-type">STRING</td><td>Bronze + Geo</td><td>Ward identifier (community_board for NYC; ward_no for India)</td></tr>
+          <tr><td class="td-key">city</td><td class="td-type">STRING</td><td>Bronze</td><td>City name; borough used for NYC</td></tr>
+          <tr><td class="td-key">latitude</td><td class="td-type">DOUBLE</td><td>Bronze</td><td>Validated; null-filled from zip centroid if missing</td></tr>
+          <tr><td class="td-key">longitude</td><td class="td-type">DOUBLE</td><td>Bronze</td><td>Same</td></tr>
+          <tr><td class="td-key">clean_description</td><td class="td-type">STRING</td><td><span class="td-badge badge-derived">NLP</span></td><td>Lowercased, stopword-removed descriptor text</td></tr>
+          <tr><td class="td-key">dow_filed</td><td class="td-type">INTEGER</td><td><span class="td-badge badge-derived">Derived</span></td><td>Day of week (0=Monday) when complaint was filed</td></tr>
+          <tr><td class="td-key">hour_filed</td><td class="td-type">INTEGER</td><td><span class="td-badge badge-derived">Derived</span></td><td>Hour of day when complaint was filed</td></tr>
+          <tr><td class="td-key">month_filed</td><td class="td-type">INTEGER</td><td><span class="td-badge badge-derived">Derived</span></td><td>Month (1–12)</td></tr>
+          <tr><td class="td-key">is_weekend</td><td class="td-type">BOOLEAN</td><td><span class="td-badge badge-derived">Derived</span></td><td>Filed on Saturday or Sunday</td></tr>
+          <tr><td class="td-key">source</td><td class="td-type">STRING</td><td>Bronze</td><td>Dataset origin tag</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Gold Layer — ML-Ready Training Table Schema</h3>
+    <p>Final table: <code>civicpulse.ml.training_complaint_states</code>. This is what all 4 models train on.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th><th>Feature Group</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">complaint_id</td><td class="td-type">STRING</td><td>Primary key</td><td>ID</td></tr>
+          <tr><td class="td-key">resolution_days</td><td class="td-type">DOUBLE</td><td>Regression target (days to close)</td><td>TARGET</td></tr>
+          <tr><td class="td-key">never_resolved</td><td class="td-type">INTEGER</td><td>Classification target (1 = black hole)</td><td>TARGET</td></tr>
+          <tr><td class="td-key">complaint_category_enc</td><td class="td-type">INTEGER</td><td>Label-encoded complaint category</td><td>Categorical</td></tr>
+          <tr><td class="td-key">department_enc</td><td class="td-type">INTEGER</td><td>Label-encoded department</td><td>Categorical</td></tr>
+          <tr><td class="td-key">ward_enc</td><td class="td-type">INTEGER</td><td>Label-encoded ward ID</td><td>Categorical</td></tr>
+          <tr><td class="td-key">dow_filed</td><td class="td-type">INTEGER</td><td>Day of week filed (0–6)</td><td>Temporal</td></tr>
+          <tr><td class="td-key">hour_filed</td><td class="td-type">INTEGER</td><td>Hour of day filed (0–23)</td><td>Temporal</td></tr>
+          <tr><td class="td-key">month_filed</td><td class="td-type">INTEGER</td><td>Month filed (1–12)</td><td>Temporal</td></tr>
+          <tr><td class="td-key">is_weekend</td><td class="td-type">INTEGER</td><td>1 if filed on weekend</td><td>Temporal</td></tr>
+          <tr><td class="td-key">dept_open_complaints_30d</td><td class="td-type">DOUBLE</td><td>Department backlog: open complaints in last 30 days at filing time</td><td>Demand</td></tr>
+          <tr><td class="td-key">dept_resolution_rate_hist</td><td class="td-type">DOUBLE</td><td>Historical % of complaints this dept resolved within 30 days</td><td>Historical</td></tr>
+          <tr><td class="td-key">ward_resolution_rate_hist</td><td class="td-type">DOUBLE</td><td>Historical resolution rate for this ward × complaint_category combo</td><td>Historical</td></tr>
+          <tr><td class="td-key">ward_blackhole_rate</td><td class="td-type">DOUBLE</td><td>% of past complaints in this ward never resolved (rolling 12 months)</td><td>Historical</td></tr>
+          <tr><td class="td-key">median_resolution_days_ward_type</td><td class="td-type">DOUBLE</td><td>Median resolution days for this ward × complaint type historically</td><td>Historical</td></tr>
+          <tr><td class="td-key">description_length</td><td class="td-type">INTEGER</td><td>Character length of complaint description text</td><td>NLP</td></tr>
+          <tr><td class="td-key">urgency_score</td><td class="td-type">DOUBLE</td><td>Rule-based urgency score from text keywords (0–1)</td><td>NLP</td></tr>
+          <tr><td class="td-key">topic_id</td><td class="td-type">INTEGER</td><td>LDA topic cluster ID from complaint description</td><td>NLP</td></tr>
+          <tr><td class="td-key">tfidf_feat_1..tfidf_feat_50</td><td class="td-type">DOUBLE</td><td>Top-50 TF-IDF features from complaint description (SVD-reduced)</td><td>NLP</td></tr>
+          <tr><td class="td-key">latitude</td><td class="td-type">DOUBLE</td><td>Complaint latitude</td><td>Geo</td></tr>
+          <tr><td class="td-key">longitude</td><td class="td-type">DOUBLE</td><td>Complaint longitude</td><td>Geo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Gold Output Table — Ward Risk Scores (for Heatmap)</h3>
+    <p>Table: <code>civicpulse.output.ward_risk_scores</code></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">ward_id</td><td class="td-type">STRING</td><td>Ward identifier</td></tr>
+          <tr><td class="td-key">complaint_category</td><td class="td-type">STRING</td><td>Complaint category</td></tr>
+          <tr><td class="td-key">blackhole_risk_score</td><td class="td-type">DOUBLE</td><td>Model-predicted probability of never resolving (0–1)</td></tr>
+          <tr><td class="td-key">predicted_resolution_days</td><td class="td-type">DOUBLE</td><td>Predicted median resolution time in days</td></tr>
+          <tr><td class="td-key">open_complaint_count</td><td class="td-type">LONG</td><td>Current open complaints in this ward × category</td></tr>
+          <tr><td class="td-key">risk_tier</td><td class="td-type">STRING</td><td>LOW | MEDIUM | HIGH | CRITICAL (computed from blackhole_risk_score)</td></tr>
+          <tr><td class="td-key">score_date</td><td class="td-type">DATE</td><td>Date scores were computed (partition key)</td></tr>
+          <tr><td class="td-key">geometry</td><td class="td-type">STRING (GeoJSON)</td><td>Ward boundary polygon for rendering</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── S6 ─── -->
+  <section id="s6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">NLP Text Pipeline</h2>
+    </div>
+
+    <p>The <code>descriptor</code> column in NYC 311 complaints and equivalent text fields in Indian data contain unstructured free text — "Broken manhole cover on the road near the bus stop," "Garbage not collected for 3 days," etc. CivicPulse uses a 5-stage NLP pipeline to extract signal from this text.</p>
+
+    <div class="callout callout-success">
+      <strong>Why NLP Makes This Unique</strong>
+      Most civic data ML projects treat complaint type as a simple categorical variable. The free-text description contains urgency signals ("emergency," "flooding," "dangerous"), specificity signals (length, number of specific nouns), and topic clusters that predict resolution speed independently of the complaint category label.
+    </div>
+
+    <div class="nlp-flow">
+      <div class="nlp-step">
+        <div class="nlp-num">01</div>
+        <div class="nlp-content">
+          <div class="nlp-title">Text Cleaning & Normalisation</div>
+          <div class="nlp-desc">Lowercase, remove special characters, strip HTML entities, expand contractions. Stored in Silver as <code>clean_description</code>. Library: PySpark <code>regexp_replace</code> + Python <code>re</code>.</div>
+        </div>
+      </div>
+      <div class="nlp-step">
+        <div class="nlp-num">02</div>
+        <div class="nlp-content">
+          <div class="nlp-title">Urgency Keyword Scoring</div>
+          <div class="nlp-desc">Rule-based scoring: presence of terms like "emergency," "danger," "flooding," "leaking," "no water 3 days," "pothole accident" maps to a float urgency_score (0–1). These keywords are higher correlated with faster resolution (the squeaky wheel) AND with never-resolved (systemic failures ignored). Feature: <code>urgency_score</code>.</div>
+        </div>
+      </div>
+      <div class="nlp-step">
+        <div class="nlp-num">03</div>
+        <div class="nlp-content">
+          <div class="nlp-title">TF-IDF Vectorisation + Truncated SVD</div>
+          <div class="nlp-desc">Scikit-learn <code>TfidfVectorizer</code> (max_features=5000, ngram_range=(1,2)) → <code>TruncatedSVD</code> (n_components=50). Produces 50 dense numerical features per complaint capturing vocabulary similarity across complaint descriptions. Stored as <code>tfidf_feat_1..50</code> in Gold.</div>
+        </div>
+      </div>
+      <div class="nlp-step">
+        <div class="nlp-num">04</div>
+        <div class="nlp-content">
+          <div class="nlp-title">LDA Topic Modelling</div>
+          <div class="nlp-desc">Latent Dirichlet Allocation (sklearn <code>LatentDirichletAllocation</code>, n_topics=12) discovers latent complaint themes: e.g., Topic 0 = "water leakage pipe burst," Topic 4 = "noise construction night," Topic 9 = "road pothole accident risk." Each complaint gets a <code>topic_id</code> (dominant topic) — this is a powerful categorical feature for the downstream XGBoost.</div>
+        </div>
+      </div>
+      <div class="nlp-step">
+        <div class="nlp-num">05</div>
+        <div class="nlp-content">
+          <div class="nlp-title">NLP-Only Classifier (Standalone Model)</div>
+          <div class="nlp-desc">A separate LightGBM or Logistic Regression trained only on TF-IDF features to predict complaint_category from the raw description text — this validates that the text alone carries category signal, and generates <code>nlp_predicted_category</code> as a cross-validation feature for the main models. Target: &gt;80% top-3 accuracy.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>NLP PySpark Implementation Sketch</h3>
+    <pre><span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> Tokenizer, StopWordsRemover, HashingTF, IDF
+<span class="kw">from</span> pyspark.ml <span class="kw">import</span> Pipeline
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, udf, length
+<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> DoubleType
+<span class="kw">import</span> re
+
+<span class="cm"># Urgency keyword scoring UDF</span>
+URGENCY_KEYWORDS = [<span class="str">"emergency"</span>, <span class="str">"flood"</span>, <span class="str">"danger"</span>, <span class="str">"leak"</span>, <span class="str">"no water"</span>, <span class="str">"accident"</span>, <span class="str">"broken"</span>]
+
+<span class="kw">def</span> <span class="fn">compute_urgency</span>(text):
+    <span class="kw">if not</span> text: <span class="kw">return</span> <span class="num">0.0</span>
+    hits = sum(<span class="num">1</span> <span class="kw">for</span> kw <span class="kw">in</span> URGENCY_KEYWORDS <span class="kw">if</span> kw <span class="kw">in</span> text.lower())
+    <span class="kw">return</span> min(hits / <span class="num">3.0</span>, <span class="num">1.0</span>)
+
+urgency_udf = udf(<span class="fn">compute_urgency</span>, DoubleType())
+
+silver_df = silver_df.withColumn(<span class="str">"urgency_score"</span>, <span class="fn">urgency_udf</span>(col(<span class="str">"clean_description"</span>)))
+silver_df = silver_df.withColumn(<span class="str">"description_length"</span>, <span class="fn">length</span>(col(<span class="str">"clean_description"</span>)))
+
+<span class="cm"># TF-IDF pipeline in Spark MLlib</span>
+tokenizer = Tokenizer(inputCol=<span class="str">"clean_description"</span>, outputCol=<span class="str">"words"</span>)
+remover = StopWordsRemover(inputCol=<span class="str">"words"</span>, outputCol=<span class="str">"filtered_words"</span>)
+hashing_tf = HashingTF(inputCol=<span class="str">"filtered_words"</span>, outputCol=<span class="str">"raw_features"</span>, numFeatures=<span class="num">5000</span>)
+idf = IDF(inputCol=<span class="str">"raw_features"</span>, outputCol=<span class="str">"tfidf_features"</span>)
+
+nlp_pipeline = Pipeline(stages=[tokenizer, remover, hashing_tf, idf])
+model = nlp_pipeline.fit(silver_df)
+gold_df = model.transform(silver_df)</pre>
+  </section>
+
+  <!-- ─── S7 ─── -->
+  <section id="s7">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Medallion Architecture</h2>
+    </div>
+
+    <div class="arch-diagram">
+      <div class="arch-row">
+        <div class="arch-layer">
+          <span class="arch-badge badge-bronze">Bronze</span>
+          <div class="arch-layer-title">Raw Ingestion</div>
+          <div class="arch-items">
+            NYC 311 Socrata API<br>
+            data.gov.in CSVs<br>
+            BMC / Kaggle CSVs<br>
+            Ward Shapefiles<br>
+            ──<br>
+            Auto Loader<br>
+            Delta Lake<br>
+            S3: s3://civicpulse/bronze/
+          </div>
+        </div>
+        <div class="arch-layer">
+          <span class="arch-badge badge-silver">Silver</span>
+          <div class="arch-layer-title">Cleaned & Enriched</div>
+          <div class="arch-items">
+            Schema enforcement<br>
+            Null handling<br>
+            Duration computed<br>
+            Target labels created<br>
+            NLP text cleaning<br>
+            ──<br>
+            DLT Streaming Tables<br>
+            S3: s3://civicpulse/silver/
+          </div>
+        </div>
+        <div class="arch-layer">
+          <span class="arch-badge badge-gold">Gold</span>
+          <div class="arch-layer-title">ML-Ready Features</div>
+          <div class="arch-items">
+            All engineered features<br>
+            TF-IDF vectors<br>
+            Historical agg rates<br>
+            Dept backlog signals<br>
+            Ward risk history<br>
+            ──<br>
+            DLT Materialised View<br>
+            S3: s3://civicpulse/gold/
+          </div>
+        </div>
+        <div class="arch-layer">
+          <span class="arch-badge badge-serve">Serve</span>
+          <div class="arch-layer-title">Output & Serve</div>
+          <div class="arch-items">
+            Ward risk scores<br>
+            Model predictions<br>
+            Folium heatmap<br>
+            MLflow dashboard<br>
+            ──<br>
+            Databricks SQL<br>
+            Streamlit / HTML
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Delta Live Tables Notebook Structure</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Notebook</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">01_ingest_bronze</td><td class="td-type">DLT Streaming</td><td>Auto Loader ingestion from S3 raw drop zone. Writes to <code>civicpulse.bronze.complaints_raw</code></td></tr>
+          <tr><td class="td-key">02_clean_silver</td><td class="td-type">DLT Streaming</td><td>Clean, validate, derive duration/labels, NLP clean. Writes to <code>civicpulse.silver.complaints_clean</code></td></tr>
+          <tr><td class="td-key">03_aggregate_silver</td><td class="td-type">DLT Table</td><td>Historical aggregates: dept_resolution_rate, ward_blackhole_rate, etc. Writes to <code>civicpulse.silver.ward_dept_agg</code></td></tr>
+          <tr><td class="td-key">04_nlp_features</td><td class="td-type">Python Notebook</td><td>TF-IDF, SVD, LDA, urgency scoring. Outputs feature tables joined to Silver.</td></tr>
+          <tr><td class="td-key">05_build_gold</td><td class="td-type">DLT Materialised View</td><td>JOIN silver + aggregates + NLP features → <code>civicpulse.ml.training_complaint_states</code></td></tr>
+          <tr><td class="td-key">06_train_models</td><td class="td-type">ML Notebook</td><td>Train all 4 models; log to MLflow; register best in Unity Catalog</td></tr>
+          <tr><td class="td-key">07_score_wards</td><td class="td-type">Batch Scoring</td><td>Run models on latest open complaints; write to <code>civicpulse.output.ward_risk_scores</code></td></tr>
+          <tr><td class="td-key">08_visualise</td><td class="td-type">Viz Notebook</td><td>Build Folium heatmap; generate HTML output for embedding</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Delta Live Tables Pipeline DAG</h3>
+    <pre><span class="cm">## Notebook: 02_clean_silver.py</span>
+<span class="kw">import</span> dlt
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, datediff, when, to_timestamp, dayofweek, hour, month
+
+@dlt.table(
+    name=<span class="str">"complaints_clean"</span>,
+    comment=<span class="str">"Silver layer: cleaned and labelled complaint records"</span>,
+    table_properties={<span class="str">"quality"</span>: <span class="str">"silver"</span>}
+)
+@dlt.expect_or_drop(<span class="str">"valid_complaint_id"</span>, <span class="str">"complaint_id IS NOT NULL"</span>)
+@dlt.expect_or_drop(<span class="str">"valid_created_date"</span>, <span class="str">"created_date IS NOT NULL"</span>)
+<span class="kw">def</span> <span class="fn">complaints_clean</span>():
+    bronze = dlt.read_stream(<span class="str">"complaints_raw"</span>)
+    <span class="kw">return</span> (bronze
+        .withColumn(<span class="str">"resolution_days"</span>,
+            <span class="fn">datediff</span>(col(<span class="str">"closed_date"</span>), col(<span class="str">"created_date"</span>)))
+        .withColumn(<span class="str">"never_resolved"</span>,
+            <span class="fn">when</span>((col(<span class="str">"closed_date"</span>).isNull()) &
+                 (<span class="fn">datediff</span>(<span class="str">"current_date"</span>, col(<span class="str">"created_date"</span>)) > <span class="num">90</span>), <span class="num">1</span>).otherwise(<span class="num">0</span>))
+        .withColumn(<span class="str">"dow_filed"</span>, <span class="fn">dayofweek</span>(col(<span class="str">"created_date"</span>)))
+        .withColumn(<span class="str">"hour_filed"</span>, <span class="fn">hour</span>(col(<span class="str">"created_date"</span>)))
+        .withColumn(<span class="str">"month_filed"</span>, <span class="fn">month</span>(col(<span class="str">"created_date"</span>)))
+        .filter(col(<span class="str">"complaint_id"</span>).isNotNull())
+    )</pre>
+  </section>
+
+  <!-- ─── S8 ─── -->
+  <section id="s8">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Feature Engineering Catalogue</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Type</th><th>Group</th><th>How to Compute</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">resolution_days</td><td class="td-type">DOUBLE</td><td>Target</td><td>datediff(closed_date, created_date)</td><td>Regression target</td></tr>
+          <tr><td class="td-key">never_resolved</td><td class="td-type">INT (0/1)</td><td>Target</td><td>status == open AND age &gt; 90 days</td><td>Classification target (black hole label)</td></tr>
+          <tr><td class="td-key">dow_filed</td><td class="td-type">INT</td><td>Temporal</td><td>dayofweek(created_date)</td><td>Complaints filed Friday often not actioned till Monday</td></tr>
+          <tr><td class="td-key">hour_filed</td><td class="td-type">INT</td><td>Temporal</td><td>hour(created_date)</td><td>Night-time complaints lag 8+ hours before acknowledgement</td></tr>
+          <tr><td class="td-key">month_filed</td><td class="td-type">INT</td><td>Temporal</td><td>month(created_date)</td><td>Seasonal: monsoon → flooding spike; summer → heat/water</td></tr>
+          <tr><td class="td-key">is_weekend</td><td class="td-type">INT</td><td>Temporal</td><td>dow_filed IN (1, 7)</td><td>Weekend filings have ~25% longer resolution</td></tr>
+          <tr><td class="td-key">dept_open_complaints_30d</td><td class="td-type">DOUBLE</td><td>Demand</td><td>COUNT(*) WHERE status=open AND created_date in last 30d GROUP BY dept</td><td>Measures department overload at time of filing</td></tr>
+          <tr><td class="td-key">dept_resolution_rate_hist</td><td class="td-type">DOUBLE</td><td>Historical</td><td>% closed within SLA over trailing 12 months, per dept</td><td>Structural dept performance signal</td></tr>
+          <tr><td class="td-key">ward_blackhole_rate</td><td class="td-type">DOUBLE</td><td>Historical</td><td>% complaints in ward never resolved in 90d, trailing 12 months</td><td>Ward-level systemic failure risk</td></tr>
+          <tr><td class="td-key">ward_cat_median_resolution</td><td class="td-type">DOUBLE</td><td>Historical</td><td>PERCENTILE_APPROX(resolution_days, 0.5) GROUP BY ward, category</td><td>Baseline for that specific ward × type combination</td></tr>
+          <tr><td class="td-key">urgency_score</td><td class="td-type">DOUBLE</td><td>NLP</td><td>Keyword match score on descriptor text</td><td>Urgency language correlates with resolution speed</td></tr>
+          <tr><td class="td-key">description_length</td><td class="td-type">INT</td><td>NLP</td><td>len(clean_description)</td><td>Longer descriptions = more specific = faster action</td></tr>
+          <tr><td class="td-key">topic_id</td><td class="td-type">INT</td><td>NLP</td><td>LDA dominant topic (n_topics=12)</td><td>Topic cluster more granular than complaint category</td></tr>
+          <tr><td class="td-key">tfidf_feat_1..50</td><td class="td-type">DOUBLE</td><td>NLP</td><td>TF-IDF + TruncatedSVD(50) on descriptor</td><td>Dense text representation for tree models</td></tr>
+          <tr><td class="td-key">complaint_category_enc</td><td class="td-type">INT</td><td>Categorical</td><td>LabelEncoder on complaint_category</td><td>Main complaint type signal</td></tr>
+          <tr><td class="td-key">department_enc</td><td class="td-type">INT</td><td>Categorical</td><td>LabelEncoder on department_code</td><td>Responsible department matters enormously for resolution</td></tr>
+          <tr><td class="td-key">ward_enc</td><td class="td-type">INT</td><td>Geo</td><td>LabelEncoder on ward_id</td><td>Ward fixed effect for systemic patterns</td></tr>
+          <tr><td class="td-key">latitude, longitude</td><td class="td-type">DOUBLE</td><td>Geo</td><td>Raw coordinates from source</td><td>Spatial proximity features for geo models</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Historical Aggregation PySpark Pattern</h3>
+    <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> Window
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> count, avg, when, col
+
+<span class="cm"># Ward-level black hole rate (trailing 12 months)</span>
+ward_window = Window.partitionBy(<span class="str">"ward_id"</span>)
+
+ward_agg = (silver_df
+    .filter(col(<span class="str">"created_date"</span>) >= add_months(<span class="str">"current_date"</span>, -<span class="num">12</span>))
+    .groupBy(<span class="str">"ward_id"</span>, <span class="str">"complaint_category"</span>)
+    .agg(
+        <span class="fn">avg</span>(<span class="fn">when</span>(col(<span class="str">"never_resolved"</span>) == <span class="num">1</span>, <span class="num">1</span>).otherwise(<span class="num">0</span>)).alias(<span class="str">"ward_blackhole_rate"</span>),
+        <span class="fn">avg</span>(<span class="str">"resolution_days"</span>).alias(<span class="str">"ward_avg_resolution_days"</span>),
+        <span class="fn">count</span>(<span class="str">"*"</span>).alias(<span class="str">"ward_cat_complaint_count"</span>)
+    )
+)
+
+<span class="cm"># Join back to silver</span>
+gold_df = silver_df.join(ward_agg, on=[<span class="str">"ward_id"</span>, <span class="str">"complaint_category"</span>], how=<span class="str">"left"</span>)</pre>
+  </section>
+
+  <!-- ─── S9 ─── -->
+  <section id="s9">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">ML Model Suite — 4 Algorithms</h2>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>Design Decision — Why Multiple Models?</strong>
+      Single-algorithm projects are weak portfolio pieces. CivicPulse runs 4 algorithms across 2 tasks (regression + classification), compares them in MLflow, and selects the best per task for the production heatmap. This demonstrates model selection discipline, not just implementation.
+    </div>
+
+    <h3>Task 1 — Regression: Predict Resolution Days</h3>
+
+    <div class="model-grid">
+      <div class="model-card primary">
+        <div class="model-tag">Regression · Algorithm 1</div>
+        <div class="model-name">XGBoost Regressor</div>
+        <div class="model-desc">Gradient boosted trees. Handles non-linear feature interactions (ward × dept × complaint_type). Primary production model for regression task. Supports feature importance output.</div>
+        <div class="model-meta">n_estimators=500 · max_depth=7 · learning_rate=0.05 · subsample=0.8</div>
+      </div>
+      <div class="model-card secondary">
+        <div class="model-tag">Regression · Algorithm 2</div>
+        <div class="model-name">Random Forest Regressor</div>
+        <div class="model-desc">Ensemble of 300 decision trees. More stable than XGBoost on smaller training sets; useful baseline to diagnose overfitting. Lower variance at expense of slight bias.</div>
+        <div class="model-meta">n_estimators=300 · max_depth=15 · min_samples_leaf=5</div>
+      </div>
+    </div>
+
+    <h3>Task 2 — Classification: Predict "Never Resolved" (Black Hole)</h3>
+
+    <div class="model-grid">
+      <div class="model-card tertiary">
+        <div class="model-tag">Classification · Algorithm 3</div>
+        <div class="model-name">XGBoost Classifier</div>
+        <div class="model-desc">Primary black hole detector. Binary output: 1 = likely never resolved. Use <code>scale_pos_weight</code> to handle class imbalance (black holes are ~15–20% of complaints). Calibrate probabilities with Platt scaling for reliable ward-level risk scores.</div>
+        <div class="model-meta">scale_pos_weight=4 · eval_metric=auc · threshold=0.40</div>
+      </div>
+      <div class="model-card quaternary">
+        <div class="model-tag">Classification · Algorithm 4</div>
+        <div class="model-name">Logistic Regression (L2)</div>
+        <div class="model-desc">Interpretable baseline. Produces well-calibrated probabilities directly. Essential for stakeholder explainability — ward administrators can see which features most strongly drive the "never resolved" prediction (department load, ward history, complaint type).</div>
+        <div class="model-meta">C=0.1 (L2) · class_weight=balanced · max_iter=500</div>
+      </div>
+    </div>
+
+    <h3>Bonus — NLP Classifier (Text-Only Baseline)</h3>
+    <div class="model-grid" style="grid-template-columns: 1fr;">
+      <div class="model-card primary" style="border-left: 3px solid var(--accent4);">
+        <div class="model-tag">NLP · Algorithm 5 (Bonus)</div>
+        <div class="model-name">LightGBM on TF-IDF Features</div>
+        <div class="model-desc">Trained only on the 50 TF-IDF SVD features + urgency_score + description_length. Predicts whether the complaint will be resolved within SLA. Serves as a text-signal ablation study — quantifies how much the description text contributes to prediction beyond the structured features alone. Target: &gt;72% accuracy independently.</div>
+        <div class="model-meta">LightGBM · n_estimators=200 · features: TF-IDF only (no structured features)</div>
+      </div>
+    </div>
+
+    <h3>MLflow Tracking Schema</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Logged Item</th><th>Type</th><th>Value Example</th></tr></thead>
+        <tbody>
+          <tr><td>model_type</td><td>param</td><td>"xgboost_regressor"</td></tr>
+          <tr><td>n_estimators</td><td>param</td><td>500</td></tr>
+          <tr><td>max_depth</td><td>param</td><td>7</td></tr>
+          <tr><td>rmse</td><td>metric</td><td>4.2</td></tr>
+          <tr><td>mae</td><td>metric</td><td>2.8</td></tr>
+          <tr><td>r2</td><td>metric</td><td>0.71</td></tr>
+          <tr><td>f1_score</td><td>metric</td><td>0.79</td></tr>
+          <tr><td>auc_roc</td><td>metric</td><td>0.87</td></tr>
+          <tr><td>train_rows</td><td>tag</td><td>28000000</td></tr>
+          <tr><td>feature_importance</td><td>artifact</td><td>feature_importance.json</td></tr>
+          <tr><td>confusion_matrix</td><td>artifact</td><td>confusion_matrix.png</td></tr>
+          <tr><td>shap_summary</td><td>artifact</td><td>shap_beeswarm.png</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Feature Importance — Expected Ranking</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Expected Importance (%)</th><th>Visual</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-key">ward_blackhole_rate</td><td>28%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:120px;background:var(--accent);"></div><span class="fi-val">28%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">department_enc</td><td>22%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:94px;background:var(--accent2);"></div><span class="fi-val">22%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">dept_resolution_rate_hist</td><td>18%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:77px;background:var(--accent3);"></div><span class="fi-val">18%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">complaint_category_enc</td><td>12%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:51px;background:var(--accent4);"></div><span class="fi-val">12%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">urgency_score (NLP)</td><td>8%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:34px;background:var(--warning);"></div><span class="fi-val">8%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">topic_id (NLP)</td><td>5%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:21px;background:var(--success);"></div><span class="fi-val">5%</span></div></td>
+          </tr>
+          <tr>
+            <td class="td-key">dow_filed + hour_filed</td><td>4%</td>
+            <td><div class="feature-importance-bar"><div class="fi-bar" style="width:17px;background:var(--text-dim);"></div><span class="fi-val">4%</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── S10 ─── -->
+  <section id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2 class="section-title">Production Build Steps</h2>
+    </div>
+
+    <div class="callout callout-warn">
+      <strong>Environment</strong>
+      Databricks Community Edition (free) is sufficient to build and demo this. Use a 14.3 LTS ML Runtime cluster with a single-node config (15.3 GB RAM). AWS S3 bucket (free tier) for data storage.
+    </div>
+
+    <h3>Phase 1 — Infrastructure Setup</h3>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 1.1</strong> — Create Databricks workspace (Community Edition or AWS trial). Enable Unity Catalog. Create catalog: <code>civicpulse</code>, schemas: <code>bronze</code>, <code>silver</code>, <code>ml</code>, <code>output</code>.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 1.2</strong> — Create S3 bucket: <code>s3://civicpulse-data/</code>. Folders: <code>raw/nyc311/</code>, <code>raw/india/</code>, <code>raw/shapefiles/</code>.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 1.3</strong> — Configure Databricks ↔ S3 IAM role with <code>s3:GetObject</code>, <code>s3:PutObject</code>, <code>s3:ListBucket</code>. Set as instance profile on cluster.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 1.4</strong> — Install cluster libraries: <code>xgboost==2.0.3</code>, <code>lightgbm</code>, <code>folium</code>, <code>keplergl</code>, <code>scikit-learn</code>, <code>nltk</code>, <code>geopandas</code>, <code>shap</code>.</div></div>
+    </div>
+
+    <h3>Phase 2 — Data Ingestion</h3>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 2.1</strong> — Download NYC 311 data via Socrata API (use pagination script from Section 4). Target: 5M–10M records (2020–2024). Upload CSVs to <code>s3://civicpulse-data/raw/nyc311/</code>.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 2.2</strong> — Download India data from data.gov.in (bulk CSV). Upload to <code>s3://civicpulse-data/raw/india/</code>. Note: India data is smaller (100K–500K rows); use for validation only.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 2.3</strong> — Download ward shapefiles. NYC: <code>geo_export.geojson</code> from NYC Open Data. India: from data.gov.in ward boundaries. Upload to <code>s3://civicpulse-data/raw/shapefiles/</code>.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 2.4</strong> — Configure Auto Loader in notebook <code>01_ingest_bronze</code> to watch the S3 raw drop zones. Set <code>cloudFiles.format = "csv"</code> with schema inference + schema evolution mode.</div></div>
+    </div>
+
+    <h3>Phase 3 — Pipeline Development</h3>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 3.1</strong> — Build and test DLT pipeline <code>02_clean_silver</code>. Verify: null handling, duration computation, never_resolved label logic. Run <code>DESCRIBE TABLE civicpulse.silver.complaints_clean</code> to verify schema.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 3.2</strong> — Build aggregation notebook <code>03_aggregate_silver</code>. Test <code>ward_blackhole_rate</code> by filtering known black-hole wards (complaints open &gt;90 days). Spot-check against raw data.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 3.3</strong> — Build NLP pipeline <code>04_nlp_features</code>. Verify TF-IDF shape: (N_rows, 50). Spot-check topic_id: print top-10 words per LDA topic; they should form coherent themes.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 3.4</strong> — Build Gold materialised view <code>05_build_gold</code>. Final count check: Gold rows should match Silver (no accidental fan-out from JOINs). Assert: <code>SELECT COUNT(*) FROM civicpulse.ml.training_complaint_states</code>.</div></div>
+    </div>
+
+    <h3>Phase 4 — Model Training & Evaluation</h3>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 4.1</strong> — Train/test split: 80/20, stratified by <code>complaint_category</code> for classification task. For regression, use time-based split (train on 2020–2023, test on 2024).</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 4.2</strong> — Train all 4 models in <code>06_train_models</code>. Log each run to MLflow with full params + metrics + feature importance artifacts. Use <code>mlflow.autolog()</code> for XGBoost.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 4.3</strong> — Generate SHAP explanations for XGBoost models. Log <code>shap_summary_plot.png</code> as MLflow artifact. This is your key explainability asset for interviews.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 4.4</strong> — Register the best model per task in Unity Catalog: <code>civicpulse.ml.resolution_regressor</code> and <code>civicpulse.ml.blackhole_classifier</code>. Set alias <code>@champion</code>.</div></div>
+    </div>
+
+    <h3>Phase 5 — Scoring & Visualisation</h3>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 5.1</strong> — Run batch scoring in <code>07_score_wards</code>: load champion models from Unity Catalog, score all currently open complaints, aggregate predictions to ward level, write to <code>civicpulse.output.ward_risk_scores</code>.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 5.2</strong> — Build Folium heatmap in <code>08_visualise</code>: load ward risk scores, merge with shapefile geometries, create choropleth coloured by <code>blackhole_risk_score</code>, add popup tooltips showing open count + predicted days + risk tier.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 5.3</strong> — Export heatmap as standalone <code>ward_heatmap.html</code>. Download and host on GitHub Pages or include in README as screenshot. This is your demo asset.</div></div>
+      <div class="check-item"><div class="check-box"></div><div><strong>Step 5.4</strong> — Schedule the full pipeline as a Databricks Job (Workflow): Trigger daily at 2:00 AM. Stages: Ingest → Clean → Aggregate → Score → Visualise.</div></div>
+    </div>
+
+    <h3>Folium Heatmap Code Sketch</h3>
+    <pre><span class="kw">import</span> folium
+<span class="kw">import</span> geopandas <span class="kw">as</span> gpd
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Load ward risk scores from Delta</span>
+risk_df = spark.table(<span class="str">"civicpulse.output.ward_risk_scores"</span>).toPandas()
+
+<span class="cm"># Load ward boundary GeoJSON</span>
+wards = gpd.read_file(<span class="str">"s3://civicpulse-data/raw/shapefiles/nyc_wards.geojson"</span>)
+merged = wards.merge(risk_df, on=<span class="str">"ward_id"</span>)
+
+<span class="cm"># Build Folium choropleth</span>
+m = folium.Map(location=[<span class="num">40.7128</span>, -<span class="num">74.0060</span>], zoom_start=<span class="num">11</span>,
+               tiles=<span class="str">"CartoDB dark_matter"</span>)
+
+folium.Choropleth(
+    geo_data=merged.__geo_interface__,
+    data=risk_df,
+    columns=[<span class="str">"ward_id"</span>, <span class="str">"blackhole_risk_score"</span>],
+    key_on=<span class="str">"feature.properties.ward_id"</span>,
+    fill_color=<span class="str">"RdYlGn_r"</span>,         <span class="cm"># Red = high risk, Green = low risk</span>
+    fill_opacity=<span class="num">0.75</span>,
+    line_opacity=<span class="num">0.3</span>,
+    legend_name=<span class="str">"Black Hole Risk Score (0-1)"</span>
+).add_to(m)
+
+<span class="cm"># Add tooltips</span>
+<span class="kw">for</span> _, row <span class="kw">in</span> merged.iterrows():
+    folium.Popup(
+        f<span class="str">"Ward: {row['ward_id']}&lt;br&gt;"</span>
+        f<span class="str">"Risk Score: {row['blackhole_risk_score']:.2f}&lt;br&gt;"</span>
+        f<span class="str">"Predicted Avg Days: {row['predicted_resolution_days']:.0f}&lt;br&gt;"</span>
+        f<span class="str">"Open Complaints: {row['open_complaint_count']}"</span>
+    )
+
+m.save(<span class="str">"/tmp/ward_heatmap.html"</span>)</pre>
+  </section>
+
+  <!-- ─── S11 ─── -->
+  <section id="s11">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <h2 class="section-title">Output Layer & Visualisation</h2>
+    </div>
+
+    <h3>Deliverable Outputs</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Output</th><th>Format</th><th>Audience</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Ward Risk Heatmap</td><td>HTML (Folium)</td><td>Admin / Portfolio</td><td>Interactive choropleth — colour by blackhole_risk_score, filterable by complaint category</td></tr>
+          <tr><td>MLflow Experiment Dashboard</td><td>Databricks UI</td><td>Technical reviewer</td><td>4-model comparison table with RMSE / AUC / F1 / feature importance</td></tr>
+          <tr><td>SHAP Summary Plot</td><td>PNG (artifact)</td><td>Interview</td><td>Beeswarm SHAP plot for the XGBoost classifier — shows which features drive "never resolved"</td></tr>
+          <tr><td>ward_risk_scores Delta table</td><td>Delta Lake</td><td>BI / Reporting</td><td>Production-ready scored table with risk_tier: LOW / MEDIUM / HIGH / CRITICAL</td></tr>
+          <tr><td>Pipeline DAG Screenshot</td><td>PNG</td><td>Resume / Portfolio</td><td>DLT pipeline graph in Databricks UI</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Risk Tier Logic</h3>
+    <pre><span class="cm"># Gold scoring output: assign risk tiers</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> when, col
+
+risk_scored = predictions.withColumn(
+    <span class="str">"risk_tier"</span>,
+    <span class="fn">when</span>(col(<span class="str">"blackhole_risk_score"</span>) >= <span class="num">0.75</span>, <span class="str">"CRITICAL"</span>)
+    .when(col(<span class="str">"blackhole_risk_score"</span>) >= <span class="num">0.50</span>, <span class="str">"HIGH"</span>)
+    .when(col(<span class="str">"blackhole_risk_score"</span>) >= <span class="num">0.30</span>, <span class="str">"MEDIUM"</span>)
+    .otherwise(<span class="str">"LOW"</span>)
+)</pre>
+  </section>
+
+  <!-- ─── S12 ─── -->
+  <section id="s12">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <h2 class="section-title">Risk Register</h2>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-cell risk-high">
+        <strong>HIGH</strong>
+        India dataset sparsity — data.gov.in complaint datasets are often small (10K–50K rows) and lack closed_date, making them poor training data.
+        <br><em>Mitigation: Use NYC 311 as primary training; India as validation only.</em>
+      </div>
+      <div class="risk-cell risk-high">
+        <strong>HIGH</strong>
+        Class imbalance — never_resolved class (black holes) is only ~15–20% of complaints. Naive model predicts 0 always.
+        <br><em>Mitigation: scale_pos_weight in XGBoost; oversample with SMOTE on train set.</em>
+      </div>
+      <div class="risk-cell risk-med">
+        <strong>MEDIUM</strong>
+        Geographic transferability — NYC 311 model trained on US complaint culture; Indian ward patterns differ significantly.
+        <br><em>Mitigation: Fine-tune on Indian data subset; treat as domain adaptation problem.</em>
+      </div>
+      <div class="risk-cell risk-med">
+        <strong>MEDIUM</strong>
+        Databricks Unity Catalog S3 IAM permission errors (s3:PutObject missing) blocking model registration.
+        <br><em>Mitigation: Workaround: load via mlflow.xgboost.load_model from run URI; fix IAM separately.</em>
+      </div>
+      <div class="risk-cell risk-med">
+        <strong>MEDIUM</strong>
+        API rate limiting on Socrata — free tier has limits on concurrent requests.
+        <br><em>Mitigation: Add time.sleep(0.5) between pagination calls; use exponential backoff.</em>
+      </div>
+      <div class="risk-cell risk-low">
+        <strong>LOW</strong>
+        TF-IDF feature explosion — 5000 features without dimensionality reduction can cause OOM.
+        <br><em>Mitigation: TruncatedSVD to 50 components already planned. Monitor cluster memory.</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── S13 ─── -->
+  <section id="s13">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <h2 class="section-title">Non-Functional Requirements</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Requirement</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>Performance</td><td>Full pipeline run time (5M records)</td><td>&lt; 25 minutes</td></tr>
+          <tr><td>Scalability</td><td>Design must handle 35M records with single-node cluster resize</td><td>Spark-native (no Pandas bottlenecks)</td></tr>
+          <tr><td>Reliability</td><td>DLT expectations must catch and quarantine bad records</td><td>Zero pipeline failures from bad input</td></tr>
+          <tr><td>Reproducibility</td><td>All ML runs tracked in MLflow with params + metrics + artifacts</td><td>100% experiment traceability</td></tr>
+          <tr><td>Explainability</td><td>SHAP values for both XGBoost models</td><td>SHAP summary plot in MLflow artifacts</td></tr>
+          <tr><td>Portability</td><td>All credentials via Databricks Secrets, not hardcoded</td><td>Zero plaintext credentials in notebooks</td></tr>
+          <tr><td>Data Quality</td><td>DLT expectations on complaint_id, created_date nulls</td><td>DQ dashboard in Databricks UI</td></tr>
+          <tr><td>Documentation</td><td>README with architecture diagram, dataset links, run instructions</td><td>Viewable on GitHub without setup</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── S14 ─── -->
+  <section id="s14">
+    <div class="section-header">
+      <span class="section-num">14</span>
+      <h2 class="section-title">Project Timeline</h2>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-label">Week 1 · Days 1–7</div>
+        <div class="step-title">Infrastructure + Data Ingestion</div>
+        <div class="step-desc">Set up Databricks workspace, Unity Catalog, S3 bucket. Run Socrata ingestion script. Download India data. Write Bronze Auto Loader notebook. Validate raw schema.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">Week 2 · Days 8–14</div>
+        <div class="step-title">Silver Cleaning + Feature Engineering</div>
+        <div class="step-desc">Build DLT Silver pipeline. Compute duration, labels, temporal features. Build historical aggregation tables. Test ward_blackhole_rate against known bad wards.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">Week 3 · Days 15–21</div>
+        <div class="step-title">NLP Pipeline + Gold Table</div>
+        <div class="step-desc">Build TF-IDF + SVD + LDA pipeline. Compute urgency scores. Join all features into Gold training table. Validate row counts and null rates. EDA on Gold.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">Week 4 · Days 22–28</div>
+        <div class="step-title">Model Training + MLflow</div>
+        <div class="step-desc">Train all 4 models. Log experiments to MLflow. Generate SHAP plots. Select champion models. Register in Unity Catalog. Compare model leaderboard.</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-label">Week 5 · Days 29–35</div>
+        <div class="step-title">Heatmap + Production Polish</div>
+        <div class="step-desc">Build Folium ward heatmap. Schedule Databricks Job. Write README. Push to GitHub with architecture diagram. Record 3-minute demo video. Add to resume and LinkedIn.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-success">
+      <strong>Resume Bullet (Draft)</strong>
+      Built CivicPulse — a production Databricks pipeline processing 5M+ NYC 311 civic complaint records (PySpark, Delta Live Tables, Auto Loader) with a 4-algorithm ML suite (XGBoost Regressor + Classifier, Random Forest, Logistic Regression) achieving AUC-ROC 0.87 for "never-resolved" complaint detection. Integrated NLP pipeline (TF-IDF, LDA topic modelling, urgency scoring) surfaced as an interactive ward-level risk heatmap, identifying systemic resolution black holes for city administrators.
+    </div>
+  </section>
+
+</main>
+</div>
+
+<footer>
+  <div><span class="footer-brand">CivicPulse</span> · Software Requirements Specification v1.0</div>
+  <div>Pawan Kumar · JSS Academy of Technical Education · 2025</div>
+  <div style="font-family:var(--mono);font-size:10px;color:rgba(122,143,166,0.5);">Databricks · PySpark · Delta Lake · XGBoost · Folium</div>
+</footer>
+
+</body>
+</html>
