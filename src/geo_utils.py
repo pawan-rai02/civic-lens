@@ -109,6 +109,11 @@ def normalize_ward_name(name: str) -> str:
         return ""
     
     name = str(name).strip().lower()
+    # Replace dots/periods with spaces (handles "a.narayanapura" -> "a narayanapura")
+    name = name.replace(".", " ")
+    # Collapse multiple spaces into one
+    import re
+    name = re.sub(r'\s+', ' ', name)
     # Remove common suffixes
     name = name.replace(" ward", "").replace("-ward", "")
     return name.strip()
